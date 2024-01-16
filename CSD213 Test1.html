@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    table {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+    input,
+    button {
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div align="center">
+    <h1>Grade Activity</h1>
+
+    <button onclick="addActivity()" id="addActivity">
+      Add Activity</button>
+
+    <button onclick="editActivity()" id="editActivity">
+      Edit Activity</button>
+
+    <label for="activity">Activity</label>
+    <input type="text" id="activity" size="3">
+
+    <label for="Percentage">Percentage</label>
+    <input type="text" id="Percentage" size="3"><br>
+
+    <button onclick="addGrade()" id="addGrade">
+      Add Grade</button>
+
+    <label for="grade">Grade</label>
+    <input type="text" id="grade" size="3">
+
+    <label for="activityNo">Activity no</label>
+    <input type="text" id="activityNo" size="3"><br>
+
+    <button onclick="editActivity()" id="editActivity">
+      Edit Activity</button>
+
+    <button onclick="deleteActivity()" id="deleteActivity">
+      Delete Activity </button>
+
+    <table border="2" id="theTable" style="width:70%">
+      <tr>
+        <th>No</th>
+        <th>Activity</th>
+        <th>Percentage</th>
+        <th>Grade</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Lab1</td>
+        <td>10</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Lab2</td>
+        <td>20</td>
+        <td></td>
+      </tr>
+    </table>
+    <p id="ERR" style="color:red;">Error Message: </p>
+    <script>
+      let noActivity = 2;
+      const totalWeight = 100;
+      const ERR = document.getElementById("ERR");
+      let selectedRow = null;
+
+      function addActivity() {
+        const activityInput = document.getElementById("activity");
+        const percentageInput = document.getElementById("Percentage");
+
+        const activity = activityInput.value.trim();
+        const percentage = parseFloat(percentageInput.value.trim());
+
+        if (!activity) {
+          showError("Activity name is rejected.");
+          return;
+        }
+
+        if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+          showError("Percentage is rejected.");
+          return;
+        }
+
+        const table = document.getElementById("theTable");
+        const newRow = table.insertRow();
+        const cells = [newRow.insertCell(), newRow.insertCell(), newRow.insertCell(), newRow.insertCell()];
+
+        cells[0].innerHTML = ++noActivity;
+        cells[1].innerHTML = activity;
+        cells[2].innerHTML = percentage;
+        cells[3].innerHTML = "";
+
+        activityInput.value = "";
+        percentageInput.value = "";
+      }
+
+      function editActivity() {
+        const activityInput = document.getElementById("activity");
+        const percentageInput = document.getElementById("Percentage");
+
+        const activity = activityInput.value.trim();
+        const percentage = parseFloat(percentageInput.value.trim());
+
+        if (!activity) {
+          showError("Activity name is rejected.");
+          return;
+        }
+
+        if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+          showError("Percentage is rejected.");
+          return;
+        }
+
+        if (selectedRow) {
+          const cells = selectedRow.cells;
+          cells[1].innerHTML = activity;
+          cells[2].innerHTML = percentage;
+
+          activityInput.value = "";
+          percentageInput.value = "";
+          selectedRow = null;
+        } else {
+          showError("Please select an activity to edit.");
+        }
+      }
+
+      function addGrade() {
+        const gradeInput = document.getElementById("grade");
+        const activityNoInput = document.getElementById("activityNo");
+
+        const grade = parseFloat(gradeInput.value.trim());
+        const activityNo = parseInt(activityNoInput.value.trim());
+
+        if (isNaN(grade) || grade < 0 || grade > 100) {
+          showError("Grade is rejected.");
+          return;
+        }
+
+        const table = document.getElementById("theTable");
+        const rowCount = table.rows.length;
+
+        if (activityNo < 1 || activityNo > noActivity) {
+          showError("Activity No is rejected.");
+          return;
+        }
+
+        const row = table.rows[activityNo];
+
+        if (row.cells[3].innerHTML !== "") {
+          // If the activity already has a grade, replace it
+          row.cells[3].innerHTML = grade;
+        } else {
+          // If the activity does not have a grade, add a new one
+          row.cells[3].innerHTML = grade;
+        }
+
+        gradeInput.value = "";
+        activityNoInput.value = "";
+      }
+
+      function deleteActivity() {
+        const table = document.getElementById("theTable");
+        const rowCount = table.rows.length;
+
+        if (rowCount > 1) {
+          // If there are activities to delete
+          table.deleteRow(rowCount - 1);
+          noActivity--;
+        } else {
+          showError("No more activities to remove.");
+        }
+      }
+
+      function showError(errorMessage) {
+        ERR.innerHTML = "Error Message: " + errorMessage;
+      }
+
+      function selectRow(row) {
+        if (selectedRow) {
+          selectedRow.classList.remove("selected");
+        }
+        selectedRow = row;
+        selectedRow.classList.add("selected");
+
+        const cells = selectedRow.cells;
+        document.getElementById("activity").value = cells[1].innerHTML;
+        document.getElementById("Percentage").value = cells[2].innerHTML;
+      }
+    </script>
+  </div>
+</body>
+
+</html>
